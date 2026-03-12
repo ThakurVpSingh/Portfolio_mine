@@ -1,0 +1,42 @@
+[dotenv@17.3.1] injecting env (2) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+Server is running on port: 5000
+MongoDB connection error: MongooseServerSelectionError: Could not connect to any servers in your MongoDB Atlas cluster. One common reason is that you're trying to access the database from an IP that isn't whitelisted. Make sure your current IP address is on your Atlas cluster's IP whitelist: https://www.mongodb.com/docs/atlas/security-whitelist/
+    at _handleConnectionErrors (C:\Users\vaibh\OneDrive\Desktop\portfolio\server\node_modules\mongoose\lib\connection.js:1168:11)
+    at NativeConnection.openUri (C:\Users\vaibh\OneDrive\Desktop\portfolio\server\node_modules\mongoose\lib\connection.js:1099:11) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'cluster0-shard-00-00.0fcmfov.mongodb.net:27017' => [ServerDescription],
+      'cluster0-shard-00-01.0fcmfov.mongodb.net:27017' => [ServerDescription],
+      'cluster0-shard-00-02.0fcmfov.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xxx-shard-0',
+    maxElectionId: null,
+    maxSetVersion: null,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  cause: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'cluster0-shard-00-00.0fcmfov.mongodb.net:27017' => [ServerDescription],
+      'cluster0-shard-00-01.0fcmfov.mongodb.net:27017' => [ServerDescription],
+      'cluster0-shard-00-02.0fcmfov.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xxx-shard-0',
+    maxElectionId: null,
+    maxSetVersion: null,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  }
+}

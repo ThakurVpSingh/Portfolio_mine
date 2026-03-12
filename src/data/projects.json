@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "title": "MERN Stack E-commerce",
+    "description": "A full-featured e-commerce platform with secure payments and admin dashboard.",
+    "tech": ["React", "Node.js", "Express", "MongoDB"],
+    "link": "#"
+  },
+  {
+    "id": 2,
+    "title": "AI Content Generator",
+    "description": "Leveraging Gemini API to generate marketing content and social media posts.",
+    "tech": ["React", "Gemini API", "Node.js"],
+    "link": "#"
+  }
+]

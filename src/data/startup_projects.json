@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1,
+    "name": "Custom SaaS Dashboard",
+    "usedTechnology": "React, Tailwind, Node.js",
+    "productDescription": "A robust dashboard for managing business metrics and client data.",
+    "clientFeedback": {
+      "expense": "Premium",
+      "experience": "Excellent, highly professional team.",
+      "duration": "2 months",
+      "workingCondition": "Smooth and agile"
+    }
+  }
+]

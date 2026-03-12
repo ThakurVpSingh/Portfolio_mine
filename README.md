@@ -1,85 +1,98 @@
-# Vaibhav Pratap Singh - Portfolio Website
+# Vaibhav Pratap Singh - Full Stack Portfolio (MERN)
 
-A modern, responsive, and dynamic personal portfolio website built with React and Vite. It showcases professional experience, featured projects, education, a contact form, and a dedicated admin dashboard for content management. 
+A professional, high-performance personal portfolio website built with the **MERN Stack** (MongoDB, Express, React, Node.js). This site features a fully integrated backend for global data persistence, a dynamic admin dashboard, and an interactive frontend.
 
-## 🚀 Features
+## 🚀 Key Features
 
-- **Dynamic Hero Section**: Interactive introduction featuring a custom `useTypewriter` hook for realistic typing and typo-correction animations.
-- **Responsive Design**: Beautifully styled using pure CSS with glassmorphism effects, ensuring a seamless experience across all devices (Desktop, Tablet, iOS, and Android).
-- **Admin Dashboard**: A secure, built-in admin panel (simulated authentication) allowing the owner to:
-  - Add, edit, or delete **Projects**, **Experience**, and **Education** records.
-  - Manage and moderate **Client Feedback** before it goes live on the site.
-  - View simulated recent visitors and authentication logs.
-- **"VP Group" Startup Section**: Highlights business initiatives, client services, and features a user authentication flow for submitting feedback.
-- **Interactive Contact Form**: Fully functional contact form integrated with **Web3Forms**. (Requires a Web3Forms access key).
-- **Smooth Animations**: Page transitions and element animations powered by **Framer Motion**.
-- **Modern UI Components**: Sleek icons provided by **Lucide React**.
+- **Full MERN Integration**: Replaced `localStorage` with **MongoDB Atlas** for secure, global data persistence across all devices.
+- **Dynamic Content Management**: A robust **Admin Portal** to manage Projects, Experience, Education, and Feedback in real-time.
+- **Global Profile Sync**: Profile images and site settings are stored in the cloud, ensuring consistency for all visitors.
+- **Startup Section (VP Group)**: Dedicated business initiatives page with authenticated user feedback submission.
+- **Responsive Aesthetics**: Modern **Glassmorphism** UI designed with Vanilla CSS, optimized for mobile (Desktop, Tablet, iOS, Android).
+- **Animations**: Fluid transitions and interactive elements powered by **Framer Motion**.
 
 ## 🛠️ Tech Stack
 
-- **Framework**: [React 19](https://react.dev/)
-- **Build Tool**: [Vite](https://vitejs.dev/)
+### Frontend
+- **Framework**: [React 19](https://react.dev/) + [Vite](https://vitejs.dev/)
 - **Routing**: [React Router DOM v7](https://reactrouter.com/)
 - **Animations**: [Framer Motion](https://www.framer.com/motion/)
 - **Icons**: [Lucide React](https://lucide.dev/)
-- **Styling**: Vanilla CSS (CSS3, Flexbox, CSS Grid) with a custom dark-theme glassmorphic design system.
+- **Deployment**: [Vercel](https://vercel.com/)
+
+### Backend
+- **Runtime**: [Node.js](https://nodejs.org/)
+- **Framework**: [Express.js](https://expressjs.com/)
+- **Database**: [MongoDB Atlas](https://www.mongodb.com/atlas) (Mongoose ODM)
+- **Deployment**: [Render](https://render.com/)
+
+---
 
 ## 📦 Getting Started
 
 ### Prerequisites
-Make sure you have [Node.js](https://nodejs.org/) and `npm` installed on your machine.
+- Node.js (v18+)
+- MongoDB Atlas account (for the connection string)
 
-### Installation
+### Local Setup
 
 1. **Clone the repository**:
    ```bash
-   git clone <your-github-repo-url>
+   git clone <your-repo-url>
    cd portfolio
    ```
 
-2. **Install dependencies**:
+2. **Backend Setup**:
    ```bash
+   cd server
    npm install
    ```
+   Create a `.env` file in the `server` directory:
+   ```env
+   MONGODB_URI=your_mongodb_connection_string
+   PORT=5000
+   ```
+   Start the server:
+   ```bash
+   npm start
+   ```
 
-3. **Configure Web3Forms (for the Contact section)**:
-   - Go to `src/components/Contact.jsx`.
-   - Replace the `accessKey` string with your real Web3Forms access key. You can get one for free at [Web3Forms](https://web3forms.com/).
-
-### Running in Development
-To start the development server, run:
-```bash
-npm run dev
-```
-The application will be available at `http://localhost:5173`.
-
-### Building for Production
-To build the app for production deployment:
-```bash
-npm run build
-```
-The optimized files will be generated in the `dist` folder, ready to be deployed to platforms like Vercel, Netlify, or GitHub Pages.
-
-## 🔑 Admin Access
-By default, the application simulates an admin environment using local storage and context state.
-- Navigate to the Dashboard via the top-right menu (if visible/logged in) or by going to `/admin`.
-- You can manage content dynamically without needing a backend database for initial setup, as data is persisted in the browser's `localStorage`.
-
-## 📂 Project Structure Overview
-
-- `src/components/`: Reusable UI sections (Hero, About, Projects, Experience, Contact, Navbar, Startup).
-- `src/pages/`: Full-page route components (Admin, ProjectDetails).
-- `src/context/`: React context providers (e.g., AdminContext for auth state).
-- `src/hooks/`: Custom React hooks (e.g., useTypewriter).
-- `src/data/`: Static JSON files used to pre-populate default content.
-- `src/index.css`: Global styles, layout utilities, and responsive media queries.
-
-## 🤝 Contributing
-Contributions, issues, and feature requests are welcome!
-
-## 📝 License
-No Licence. 
+3. **Frontend Setup**:
+   ```bash
+   cd ..
+   npm install
+   ```
+   Create a `.env` file in the root directory:
+   ```env
+   VITE_API_URL=http://localhost:5000/api
+   ```
+   Start the development server:
+   ```bash
+   npm run dev
+   ```
 
 ---
 
-*Designed and developed by [Vaibhav Pratap Singh](https://github.com/vaibhav-pratap-singh).*
+## 🔑 Deployment Notes
+
+### Backend (Render)
+- **Root Directory**: `server`
+- **Build Command**: `npm install`
+- **Start Command**: `npm start`
+- **Env Variable**: `MONGODB_URI`
+
+### Frontend (Vercel)
+- **Framework Preset**: Vite
+- **Env Variable**: `VITE_API_URL` (points to your Render URL)
+
+---
+
+## 📂 Project Structure
+
+- `/src`: Frontend React components, pages, and context.
+- `/server`: Node.js/Express backend server and Mongoose models.
+- `/public`: Static assets and icons.
+
+## 🤝 Contact
+Designed and developed by **Vaibhav Pratap Singh**.  
+[GitHub](https://github.com/ThakurVpSingh) | [Portfolio Live](https://portfolio-mine-green.vercel.app/)

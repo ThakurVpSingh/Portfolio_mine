@@ -879,6 +879,7 @@ ul {
   display: grid;
   grid-template-columns: 1fr 1.5fr;
   gap: 4rem;
+  align-items: center; /* Vertically center both columns */
 }
 
 .info-item {
@@ -1611,6 +1612,7 @@ ul {
   background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline-block;
+  margin-bottom: 4rem; /* More space for the heading */
 }
 
 /* Project Details Page */

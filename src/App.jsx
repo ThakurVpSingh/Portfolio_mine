@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import About from './components/About';
@@ -53,70 +53,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    // Initialize Projects if not present
-    if (!localStorage.getItem('projects')) {
-      const initialProjects = projectsData.map(p => ({
-        ...p,
-        github: '',
-        caseStudy: '',
-        images: [],
-        category: 'Development',
-        duration: '3 Months'
-      }));
-      localStorage.setItem('projects', JSON.stringify(initialProjects));
-    }
-
-    // Initialize Experience if not present
-    if (!localStorage.getItem('experience')) {
-      const initialExperience = [
-        {
-          id: 1,
-          company: "Concentrix India Pvt. Ltd.",
-          role: "Technical Engineer",
-          duration: "August 2025 - Present",
-          location: "Gurgaon",
-          description: "Providing high-level technical support and troubleshooting for enterprise systems."
-        },
-        {
-          id: 2,
-          company: "Teleperformance India",
-          role: "Technical Support Engineer (Adobe.inc)",
-          duration: "April 2025 - July 2025",
-          description: "Handled technical queries and provided solutions for Adobe's professional software suite."
-        },
-        {
-          id: 3,
-          company: "iEnergizer IT Services Pvt. Ltd.",
-          role: "Associate Technical Support Engineer",
-          duration: "April 2024 - April 2025",
-          description: "Provided technical assistance and resolved system issues for globally based users."
-        }
-      ];
-      localStorage.setItem('experience', JSON.stringify(initialExperience));
-    }
-
-    // Initialize Education if not present
-    if (!localStorage.getItem('education')) {
-      const initialEducation = [
-        {
-          id: 1,
-          school: "Dronacharya Group of Institutions, Greater Noida",
-          degree: "Btech Computer Science & Engineering",
-          duration: "2020 - 2024",
-          description: "Full Stack Development & Software Engineering."
-        }
-      ];
-      localStorage.setItem('education', JSON.stringify(initialEducation));
-    }
-    
-    // Initialize approved flag for feedbacks if missing
-    const feedbacks = JSON.parse(localStorage.getItem('clientFeedbacks')) || [];
-    const updatedFeedbacks = feedbacks.map(fb => ({
-      ...fb,
-      approved: fb.hasOwnProperty('approved') ? fb.approved : true // Legacy feedbacks approved by default
-    }));
-    localStorage.setItem('clientFeedbacks', JSON.stringify(updatedFeedbacks));
-
+    // Data is now handled by the backend
   }, []);
 
   return (

@@ -1,13 +1,16 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-
+import { fetchData } from '../utils/api';
 
 const Experience = () => {
   const [experienceData, setExperienceData] = React.useState([]);
 
   React.useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem('experience')) || [];
-    setExperienceData(saved);
+    const loadExperience = async () => {
+      const data = await fetchData('experience');
+      setExperienceData(data);
+    };
+    loadExperience();
   }, []);
 
   return (

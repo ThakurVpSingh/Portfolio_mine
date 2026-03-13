@@ -3,10 +3,12 @@ import { motion } from 'framer-motion';
 import { useAdmin } from '../context/AdminContext';
 import { Camera } from 'lucide-react';
 import { useTypewriter } from '../hooks/useTypewriter';
+import { fetchData, postData } from '../utils/api';
 
 const Hero = () => {
   const { isAdmin } = useAdmin();
   const [profileImg, setProfileImg] = useState('/src/assets/profile.jpg');
+  const [imgLoading, setImgLoading] = useState(true);
   const fileInputRef = useRef(null);
 
   const roles = [
@@ -29,18 +31,27 @@ const Hero = () => {
   });
 
   useEffect(() => {
-    const savedImg = localStorage.getItem('profileImage');
-    if (savedImg) setProfileImg(savedImg);
+    const loadProfileImg = async () => {
+      setImgLoading(true);
+      const data = await fetchData('settings/profileImage');
+      if (data && typeof data === 'string') setProfileImg(data);
+      setImgLoading(false);
+    };
+    loadProfileImg();
   }, []);
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
+      reader.onloadend = async () => {
         const base64String = reader.result;
         setProfileImg(base64String);
-        localStorage.setItem('profileImage', base64String);
+        try {
+          await postData('settings', { key: 'profileImage', value: base64String });
+        } catch (error) {
+          alert("Error saving profile image to database.");
+        }
       };
       reader.readAsDataURL(file);
     }

@@ -1,12 +1,16 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { fetchData } from '../utils/api';
 
 const About = () => {
   const [eduData, setEduData] = React.useState([]);
 
   React.useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem('education')) || [];
-    setEduData(saved);
+    const loadEdu = async () => {
+      const data = await fetchData('education');
+      setEduData(data);
+    };
+    loadEdu();
   }, []);
 
   return (
@@ -20,7 +24,7 @@ const About = () => {
               <p>Education details will appear here once added in Admin.</p>
             ) : (
               eduData.map((edu, index) => (
-                <div key={edu.id || index} style={{ marginBottom: '1.5rem' }}>
+                <div key={edu._id || index} style={{ marginBottom: '1.5rem' }}>
                   <p><strong>{edu.degree}</strong></p>
                   <p>{edu.school} ({edu.duration})</p>
                   {edu.description && <p style={{ fontSize: '0.9rem', color: '#888', marginTop: '0.4rem' }}>{edu.description}</p>}

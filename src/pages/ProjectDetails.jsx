@@ -2,17 +2,28 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ExternalLink, Github, ChevronRight } from 'lucide-react';
+import { fetchData } from '../utils/api';
 
 const ProjectDetails = () => {
   const { id } = useParams();
   const [project, setProject] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const projects = JSON.parse(localStorage.getItem('projects')) || [];
-    const foundProject = projects.find(p => p.id.toString() === id);
-    setProject(foundProject);
-    window.scrollTo(0, 0);
+    const loadProject = async () => {
+      setLoading(true);
+      const data = await fetchData(`projects/${id}`);
+      // fetchData returns [] on error, so we check if it's an object with a title/title
+      setProject(Array.isArray(data) ? null : data);
+      setLoading(false);
+      window.scrollTo(0, 0);
+    };
+    loadProject();
   }, [id]);
+
+  if (loading) {
+    return <div className="container section"><p>Loading project details...</p></div>;
+  }
 
   if (!project) {
     return (

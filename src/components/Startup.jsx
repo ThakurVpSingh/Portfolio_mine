@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import startupProjectsData from '../data/startup_projects.json';
 import { Rocket, Users, CheckCircle, ExternalLink, Trash2, Edit3, X, LogIn, Mail, Github, Facebook, Phone, Fingerprint } from 'lucide-react';
 import { useAdmin } from '../context/AdminContext';
+import { fetchData, postData, putData, deleteData } from '../utils/api';
 
 const AuthModal = ({ onLogin, onClose }) => {
   const [step, setStep] = useState('method'); // method, input, otp
@@ -254,8 +255,11 @@ const Startup = () => {
   });
 
   useEffect(() => {
-    const savedFeedbacks = JSON.parse(localStorage.getItem('clientFeedbacks')) || [];
-    setFeedbacks(savedFeedbacks);
+    const loadFeedbacks = async () => {
+      const data = await fetchData('feedback');
+      setFeedbacks(data);
+    };
+    loadFeedbacks();
     
     const savedMyIds = JSON.parse(localStorage.getItem('myFeedbackIds')) || [];
     setMyFeedbackIds(savedMyIds);
@@ -265,46 +269,44 @@ const Startup = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmitFeedback = (e) => {
+  const handleSubmitFeedback = async (e) => {
     e.preventDefault();
     
-    if (editingId) {
-      const updatedFeedbacks = feedbacks.map(fb => 
-        fb.id === editingId ? { ...formData, id: fb.id, timestamp: fb.timestamp } : fb
-      );
-      setFeedbacks(updatedFeedbacks);
-      localStorage.setItem('clientFeedbacks', JSON.stringify(updatedFeedbacks));
-      setEditingId(null);
-    } else {
-      const newFeedback = {
-        ...formData,
-        id: Date.now(),
-        timestamp: Date.now()
-      };
-      const updatedFeedbacks = [...feedbacks, newFeedback];
-      setFeedbacks(updatedFeedbacks);
-      localStorage.setItem('clientFeedbacks', JSON.stringify(updatedFeedbacks));
-      
-      const updatedMyIds = [...myFeedbackIds, newFeedback.id];
-      setMyFeedbackIds(updatedMyIds);
-      localStorage.setItem('myFeedbackIds', JSON.stringify(updatedMyIds));
-    }
+    try {
+      if (editingId) {
+        const updated = await putData('feedback', editingId, formData);
+        setFeedbacks(feedbacks.map(fb => fb._id === editingId ? updated : fb));
+        setEditingId(null);
+      } else {
+        const savedFeedback = await postData('feedback', formData);
+        setFeedbacks([...feedbacks, savedFeedback]);
+        
+        const updatedMyIds = [...myFeedbackIds, savedFeedback._id];
+        setMyFeedbackIds(updatedMyIds);
+        localStorage.setItem('myFeedbackIds', JSON.stringify(updatedMyIds));
+      }
 
-    setFormData({
-      name: '',
-      companyName: '',
-      websiteLink: '',
-      duration: '',
-      service: 'General Consultation',
-      experience: ''
-    });
+      setFormData({
+        name: '',
+        companyName: '',
+        websiteLink: '',
+        duration: '',
+        service: 'General Consultation',
+        experience: ''
+      });
+    } catch (error) {
+      alert("Error submitting feedback. Please try again.");
+    }
   };
 
-  const handleDeleteFeedback = (id) => {
+  const handleDeleteFeedback = async (id) => {
     if (window.confirm("Are you sure you want to delete this feedback?")) {
-      const updated = feedbacks.filter(fb => fb.id !== id);
-      setFeedbacks(updated);
-      localStorage.setItem('clientFeedbacks', JSON.stringify(updated));
+      try {
+        await deleteData('feedback', id);
+        setFeedbacks(feedbacks.filter(fb => fb._id !== id));
+      } catch (error) {
+        alert("Error deleting feedback.");
+      }
     }
   };
 
@@ -317,15 +319,15 @@ const Startup = () => {
       service: fb.service || 'General Consultation',
       experience: fb.experience
     });
-    setEditingId(fb.id);
+    setEditingId(fb._id);
     document.getElementById('feedback-form').scrollIntoView({ behavior: 'smooth' });
   };
 
   const canEdit = (fb) => {
     if (isAdmin) return true;
     const twoHoursInMs = 2 * 60 * 60 * 1000;
-    const isOwner = myFeedbackIds.includes(fb.id);
-    const windowOpen = (Date.now() - fb.timestamp) < twoHoursInMs;
+    const isOwner = myFeedbackIds.includes(fb._id);
+    const windowOpen = (Date.now() - new Date(fb.createdAt).getTime()) < twoHoursInMs;
     return isOwner && windowOpen;
   };
 
@@ -391,7 +393,7 @@ const Startup = () => {
                         </button>
                       )}
                       {isAdmin && (
-                        <button onClick={() => handleDeleteFeedback(fb.id)} title="Delete Feedback" className="action-btn delete">
+                        <button onClick={() => handleDeleteFeedback(fb._id)} title="Delete Feedback" className="action-btn delete">
                           <Trash2 size={16} />
                         </button>
                       )}

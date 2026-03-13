@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { LogOut, Settings, Image as ImageIcon, MessageSquare, Users, Trash2, Edit3, Briefcase, CheckCircle, XCircle, Upload, X } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { fetchData, postData, putData, deleteData } from '../utils/api';
 import { useAdmin } from '../context/AdminContext';
-import { LogOut, Settings, Image as ImageIcon, MessageSquare, Users, Trash2, Edit3, Briefcase, CheckCircle, XCircle } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 const Admin = () => {
   const { isAdmin, login, logout } = useAdmin();
+  const fileInputRef = useRef(null);
   const [password, setPassword] = useState('');
   const [activeTab, setActiveTab] = useState('overview');
   
@@ -17,7 +19,7 @@ const Admin = () => {
 
   const [editingProjectId, setEditingProjectId] = useState(null);
   const [projectForm, setProjectForm] = useState({
-    title: '', tech: '', link: '', github: '', description: '', caseStudy: '', category: 'Development', duration: '', images: ''
+    title: '', tech: '', link: '', github: '', description: '', caseStudy: '', category: 'Development', duration: '', images: []
   });
 
   // Experience Form State
@@ -34,11 +36,22 @@ const Admin = () => {
 
   useEffect(() => {
     if (isAdmin) {
-      setPersons(JSON.parse(localStorage.getItem('recentPersons')) || []);
-      setProjects(JSON.parse(localStorage.getItem('projects')) || []);
-      setExperience(JSON.parse(localStorage.getItem('experience')) || []);
-      setEducation(JSON.parse(localStorage.getItem('education')) || []);
-      setFeedbacks(JSON.parse(localStorage.getItem('clientFeedbacks')) || []);
+      const loadAllData = async () => {
+        const [projectsData, expData, eduData, feedbackData] = await Promise.all([
+          fetchData('projects'),
+          fetchData('experience'),
+          fetchData('education'),
+          fetchData('feedback')
+        ]);
+        setProjects(projectsData);
+        setExperience(expData);
+        setEducation(eduData);
+        setFeedbacks(feedbackData);
+        
+        // For persons we can keep local for now as it's a simple auth log
+        setPersons(JSON.parse(localStorage.getItem('recentPersons')) || []);
+      };
+      loadAllData();
     }
   }, [isAdmin]);
 
@@ -48,96 +61,142 @@ const Admin = () => {
   };
 
   // --- Projects CRUD ---
-  const handleProjectSubmit = (e) => {
+  const handleProjectSubmit = async (e) => {
     e.preventDefault();
     const techArray = typeof projectForm.tech === 'string' ? projectForm.tech.split(',').map(t => t.trim()) : projectForm.tech;
-    const imagesArray = typeof projectForm.images === 'string' ? projectForm.images.split(',').map(img => img.trim()).filter(img => img) : projectForm.images;
     
-    let updated;
-    if (editingProjectId) {
-      updated = projects.map(p => p.id === editingProjectId ? { ...projectForm, tech: techArray, images: imagesArray, id: p.id } : p);
-      setEditingProjectId(null);
-    } else {
-      const newProject = { ...projectForm, tech: techArray, images: imagesArray, id: Date.now() };
-      updated = [...projects, newProject];
+    // images is already an array in our state now
+    const payload = { ...projectForm, tech: techArray };
+    
+    try {
+      if (editingProjectId) {
+        const updated = await putData('projects', editingProjectId, payload);
+        setProjects(projects.map(p => p._id === editingProjectId ? updated : p));
+        setEditingProjectId(null);
+      } else {
+        const saved = await postData('projects', payload);
+        setProjects([...projects, saved]);
+      }
+      setProjectForm({ title: '', tech: '', link: '', github: '', description: '', caseStudy: '', category: 'Development', duration: '', images: [] });
+    } catch (error) {
+      alert("Error saving project.");
     }
-    setProjects(updated);
-    localStorage.setItem('projects', JSON.stringify(updated));
-    setProjectForm({ title: '', tech: '', link: '', github: '', description: '', caseStudy: '', category: 'Development', duration: '', images: '' });
   };
 
-  const deleteProject = (id) => {
+  const handleImageUpload = (e) => {
+    const files = Array.from(e.target.files);
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProjectForm(prev => ({
+          ...prev,
+          images: [...prev.images, reader.result]
+        }));
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removeImage = (index) => {
+    setProjectForm(prev => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index)
+    }));
+  };
+
+  const deleteProject = async (id) => {
     if (window.confirm("Delete project?")) {
-      const updated = projects.filter(p => p.id !== id);
-      setProjects(updated);
-      localStorage.setItem('projects', JSON.stringify(updated));
+      try {
+        await deleteData('projects', id);
+        setProjects(projects.filter(p => p._id !== id));
+      } catch (error) {
+        alert("Error deleting project.");
+      }
     }
   };
 
   const startEditProject = (p) => {
-    setProjectForm({ ...p, tech: p.tech.join(', '), images: p.images.join(', ') });
-    setEditingProjectId(p.id);
+    setProjectForm({ ...p, tech: p.tech.join(', '), images: p.images || [] });
+    setEditingProjectId(p._id);
     document.getElementById('cms-form').scrollIntoView({ behavior: 'smooth' });
   };
 
   // --- Experience CRUD ---
-  const handleExpSubmit = (e) => {
+  const handleExpSubmit = async (e) => {
     e.preventDefault();
-    let updated;
-    if (editingExpId) {
-      updated = experience.map(exp => exp.id === editingExpId ? { ...expForm, id: exp.id } : exp);
-      setEditingExpId(null);
-    } else {
-      updated = [...experience, { ...expForm, id: Date.now() }];
+    try {
+      if (editingExpId) {
+        const updated = await putData('experience', editingExpId, expForm);
+        setExperience(experience.map(exp => exp._id === editingExpId ? updated : exp));
+        setEditingExpId(null);
+      } else {
+        const saved = await postData('experience', expForm);
+        setExperience([...experience, saved]);
+      }
+      setExpForm({ company: '', role: '', duration: '', location: '', description: '' });
+    } catch (error) {
+      alert("Error saving experience.");
     }
-    setExperience(updated);
-    localStorage.setItem('experience', JSON.stringify(updated));
-    setExpForm({ company: '', role: '', duration: '', location: '', description: '' });
   };
 
-  const deleteExp = (id) => {
+  const deleteExp = async (id) => {
     if (window.confirm("Delete experience?")) {
-      const updated = experience.filter(exp => exp.id !== id);
-      setExperience(updated);
-      localStorage.setItem('experience', JSON.stringify(updated));
+      try {
+        await deleteData('experience', id);
+        setExperience(experience.filter(exp => exp._id !== id));
+      } catch (error) {
+        alert("Error deleting experience.");
+      }
     }
   };
 
   // --- Feedback Moderation ---
-  const approveFeedback = (id) => {
-    const updated = feedbacks.map(fb => fb.id === id ? { ...fb, approved: true } : fb);
-    setFeedbacks(updated);
-    localStorage.setItem('clientFeedbacks', JSON.stringify(updated));
+  const approveFeedback = async (id) => {
+    try {
+      const updated = await putData('feedback', id, { approved: true });
+      setFeedbacks(feedbacks.map(fb => fb._id === id ? updated : fb));
+    } catch (error) {
+      alert("Error approving feedback.");
+    }
   };
 
-  const deleteFeedback = (id) => {
+  const deleteFeedback = async (id) => {
     if (window.confirm("Delete feedback?")) {
-      const updated = feedbacks.filter(fb => fb.id !== id);
-      setFeedbacks(updated);
-      localStorage.setItem('clientFeedbacks', JSON.stringify(updated));
+      try {
+        await deleteData('feedback', id);
+        setFeedbacks(feedbacks.filter(fb => fb._id !== id));
+      } catch (error) {
+        alert("Error deleting feedback.");
+      }
     }
   };
 
   // --- Education CRUD ---
-  const handleEduSubmit = (e) => {
+  const handleEduSubmit = async (e) => {
     e.preventDefault();
-    let updated;
-    if (editingEduId) {
-      updated = education.map(edu => edu.id === editingEduId ? { ...eduForm, id: edu.id } : edu);
-      setEditingEduId(null);
-    } else {
-      updated = [...education, { ...eduForm, id: Date.now() }];
+    try {
+      if (editingEduId) {
+        const updated = await putData('education', editingEduId, eduForm);
+        setEducation(education.map(edu => edu._id === editingEduId ? updated : edu));
+        setEditingEduId(null);
+      } else {
+        const saved = await postData('education', eduForm);
+        setEducation([...education, saved]);
+      }
+      setEduForm({ school: '', degree: '', duration: '', description: '' });
+    } catch (error) {
+      alert("Error saving education.");
     }
-    setEducation(updated);
-    localStorage.setItem('education', JSON.stringify(updated));
-    setEduForm({ school: '', degree: '', duration: '', description: '' });
   };
 
-  const deleteEdu = (id) => {
+  const deleteEdu = async (id) => {
     if (window.confirm("Delete education record?")) {
-      const updated = education.filter(edu => edu.id !== id);
-      setEducation(updated);
-      localStorage.setItem('education', JSON.stringify(updated));
+      try {
+        await deleteData('education', id);
+        setEducation(education.filter(edu => edu._id !== id));
+      } catch (error) {
+        alert("Error deleting education.");
+      }
     }
   };
 
@@ -242,8 +301,67 @@ const Admin = () => {
                 <input type="text" value={projectForm.duration} onChange={e => setProjectForm({...projectForm, duration: e.target.value})} placeholder="e.g. 3 Months" />
               </div>
               <div className="form-group-modern full-width">
-                <label>Project Images (Comma Separated URLs)</label>
-                <input type="text" value={projectForm.images} onChange={e => setProjectForm({...projectForm, images: e.target.value})} placeholder="https://image1.jpg, https://image2.jpg" />
+                <label>Project Images</label>
+                <div className="image-upload-wrapper">
+                  <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    onChange={handleImageUpload} 
+                    accept="image/*" 
+                    multiple 
+                    style={{ display: 'none' }} 
+                  />
+                  <button 
+                    type="button" 
+                    onClick={() => fileInputRef.current.click()} 
+                    className="outline-button"
+                    style={{ marginBottom: '1rem' }}
+                  >
+                    <Upload size={18} style={{ marginRight: '0.5rem' }} /> Upload Images
+                  </button>
+                  
+                  <div className="admin-image-previews">
+                    {projectForm.images.map((img, idx) => (
+                      <div key={idx} className="admin-image-preview-item">
+                        <img src={img} alt="Preview" />
+                        <button type="button" onClick={() => removeImage(idx)} className="remove-img-btn">
+                          <X size={14} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="manual-url-input" style={{ marginTop: '1rem' }}>
+                    <p style={{ fontSize: '0.8rem', color: '#888', marginBottom: '0.5rem' }}>Or add by URL:</p>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <input 
+                        type="text" 
+                        id="manual-url"
+                        placeholder="https://example.com/image.jpg" 
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            if (e.target.value) {
+                              setProjectForm(prev => ({ ...prev, images: [...prev.images, e.target.value] }));
+                              e.target.value = '';
+                            }
+                          }
+                        }}
+                      />
+                      <button 
+                        type="button" 
+                        className="outline-button"
+                        onClick={() => {
+                          const input = document.getElementById('manual-url');
+                          if (input.value) {
+                            setProjectForm(prev => ({ ...prev, images: [...prev.images, input.value] }));
+                            input.value = '';
+                          }
+                        }}
+                      >Add</button>
+                    </div>
+                  </div>
+                </div>
               </div>
               <div className="form-group-modern full-width">
                 <label>Case Study (Markdown/Plain Text)</label>
@@ -263,13 +381,13 @@ const Admin = () => {
                 <thead><tr><th>Title</th><th>Category</th><th>Tech</th><th>Actions</th></tr></thead>
                 <tbody>
                   {projects.map(p => (
-                    <tr key={p.id}>
+                    <tr key={p._id}>
                       <td className="name-cell"><strong>{p.title}</strong></td>
                       <td>{p.category}</td>
                       <td>{p.tech.slice(0, 2).join(', ')}...</td>
                       <td className="action-cell">
                         <button onClick={() => startEditProject(p)} className="action-btn edit"><Edit3 size={16} /></button>
-                        <button onClick={() => deleteProject(p.id)} className="action-btn delete"><Trash2 size={16} /></button>
+                        <button onClick={() => deleteProject(p._id)} className="action-btn delete"><Trash2 size={16} /></button>
                       </td>
                     </tr>
                   ))}
@@ -315,17 +433,17 @@ const Admin = () => {
                 <thead><tr><th>Qualification</th><th>Institution</th><th>Duration</th><th>Actions</th></tr></thead>
                 <tbody>
                   {education.map(edu => (
-                    <tr key={edu.id}>
+                    <tr key={edu._id}>
                       <td className="name-cell"><strong>{edu.degree}</strong></td>
                       <td>{edu.school}</td>
                       <td>{edu.duration}</td>
                       <td className="action-cell">
                         <button onClick={() => {
                           setEduForm(edu);
-                          setEditingEduId(edu.id);
+                          setEditingEduId(edu._id);
                           document.getElementById('cms-form-edu').scrollIntoView({ behavior: 'smooth' });
                         }} className="action-btn edit"><Edit3 size={16} /></button>
-                        <button onClick={() => deleteEdu(edu.id)} className="action-btn delete"><Trash2 size={16} /></button>
+                        <button onClick={() => deleteEdu(edu._id)} className="action-btn delete"><Trash2 size={16} /></button>
                       </td>
                     </tr>
                   ))}
@@ -374,17 +492,17 @@ const Admin = () => {
                 <thead><tr><th>Role</th><th>Company</th><th>Duration</th><th>Actions</th></tr></thead>
                 <tbody>
                   {experience.map(exp => (
-                    <tr key={exp.id}>
+                    <tr key={exp._id}>
                       <td className="name-cell"><strong>{exp.role}</strong></td>
                       <td>{exp.company}</td>
                       <td>{exp.duration}</td>
                       <td className="action-cell">
                         <button onClick={() => {
                           setExpForm(exp);
-                          setEditingExpId(exp.id);
+                          setEditingExpId(exp._id);
                           document.getElementById('cms-form-exp').scrollIntoView({ behavior: 'smooth' });
                         }} className="action-btn edit"><Edit3 size={16} /></button>
-                        <button onClick={() => deleteExp(exp.id)} className="action-btn delete"><Trash2 size={16} /></button>
+                        <button onClick={() => deleteExp(exp._id)} className="action-btn delete"><Trash2 size={16} /></button>
                       </td>
                     </tr>
                   ))}
@@ -407,8 +525,8 @@ const Admin = () => {
                   {feedbacks.length === 0 ? (
                     <tr><td colSpan="4" className="no-data-cell">No feedback submitted yet.</td></tr>
                   ) : (
-                    feedbacks.map(fb => (
-                      <tr key={fb.id}>
+                     feedbacks.map(fb => (
+                      <tr key={fb._id}>
                         <td className="name-cell"><strong>{fb.name}</strong><br/><small>{fb.companyName}</small></td>
                         <td><span className="service-tag">{fb.service}</span></td>
                         <td>
@@ -418,11 +536,11 @@ const Admin = () => {
                         </td>
                         <td className="action-cell">
                           {!fb.approved && (
-                            <button onClick={() => approveFeedback(fb.id)} className="action-btn approve" title="Approve">
+                            <button onClick={() => approveFeedback(fb._id)} className="action-btn approve" title="Approve">
                               <CheckCircle size={16} />
                             </button>
                           )}
-                          <button onClick={() => deleteFeedback(fb.id)} className="action-btn delete" title="Delete">
+                          <button onClick={() => deleteFeedback(fb._id)} className="action-btn delete" title="Delete">
                             <Trash2 size={16} />
                           </button>
                         </td>

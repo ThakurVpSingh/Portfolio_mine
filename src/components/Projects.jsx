@@ -2,13 +2,17 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ExternalLink } from 'lucide-react';
+import { fetchData } from '../utils/api';
 
 const Projects = () => {
   const [projects, setProjects] = React.useState([]);
 
   React.useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem('projects')) || [];
-    setProjects(saved);
+    const loadProjects = async () => {
+      const data = await fetchData('projects');
+      setProjects(data);
+    };
+    loadProjects();
   }, []);
 
   return (
@@ -21,7 +25,7 @@ const Projects = () => {
           ) : (
             projects.map((project) => (
               <motion.div 
-                key={project.id}
+                key={project._id}
                 whileHover={{ scale: 1.02 }}
                 className="project-card glass-card"
               >
@@ -33,7 +37,7 @@ const Projects = () => {
                       <span key={i} className="tech-tag">{tag}</span>
                     ))}
                   </div>
-                  <Link to={`/project/${project.id}`} className="project-link">
+                  <Link to={`/project/${project._id}`} className="project-link">
                     View Case Study <ExternalLink size={16} />
                   </Link>
                 </div>

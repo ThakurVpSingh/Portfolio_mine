@@ -28,10 +28,31 @@ const About = () => {
             <h3 style={{ color: '#6366f1', marginBottom: '1.5rem' }}>Academic Journey</h3>
             {eduData.length === 0 ? (
               <p>Education details will appear here once added in Admin.</p>
+            ) : selectedEdu ? (
+              <motion.div 
+                className="expanded-edu-view"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                  <h3 style={{ color: '#6366f1', margin: 0 }}>{selectedEdu.degree}</h3>
+                  <button 
+                    className="minimize-btn dim-blink" 
+                    onClick={() => setSelectedEdu(null)}
+                    title="Minimize"
+                  >
+                    Minimize
+                  </button>
+                </div>
+                <p style={{ fontWeight: 600, marginBottom: '0.5rem' }}>{selectedEdu.school}</p>
+                <p style={{ color: '#aaa', marginBottom: '1rem', fontSize: '0.9rem' }}>{selectedEdu.duration}</p>
+                <p style={{ lineHeight: '1.6', color: '#e0e0e0' }}>{selectedEdu.description}</p>
+              </motion.div>
             ) : (
               <div className="timeline-container">
                 {eduData.map((edu, index) => (
-                  <div key={edu._id || index} className="timeline-item">
+                  <div key={edu._id || index} className="timeline-item group">
                     <p className="timeline-title"><strong>{edu.degree}</strong></p>
                     <p className="timeline-school">{edu.school} ({edu.duration})</p>
                     {edu.description && (
@@ -61,25 +82,7 @@ const About = () => {
           </div>
         </div>
       </div>
-
-      {/* Education Modal */}
-      {selectedEdu && (
-        <div className="modal-overlay" onClick={() => setSelectedEdu(null)}>
-          <motion.div 
-            className="modal-box glass-card"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            onClick={(e) => e.stopPropagation()} // Prevent click-through closing
-          >
-            <button className="modal-close-btn" onClick={() => setSelectedEdu(null)}>✕</button>
-            <h3 style={{ color: '#6366f1', marginBottom: '1rem' }}>{selectedEdu.degree}</h3>
-            <p style={{ fontWeight: 600, marginBottom: '0.5rem' }}>{selectedEdu.school}</p>
-            <p style={{ color: '#aaa', marginBottom: '1rem', fontSize: '0.9rem' }}>{selectedEdu.duration}</p>
-            <p style={{ lineHeight: '1.6', color: '#e0e0e0' }}>{selectedEdu.description}</p>
-          </motion.div>
-        </div>
-      )}
+      {/* Fullscreen modal code removed as per new UI requirements */}
     </section>
   );
 }

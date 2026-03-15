@@ -1885,3 +1885,34 @@ ul {
 .manual-url-input input {
   flex: 1;
 }
+
+/* Education Timeline Styles */
+.timeline-container {
+  margin-top: 1.5rem;
+  padding-left: 1.5rem;
+  border-left: 2px solid rgba(99, 102, 241, 0.4);
+  position: relative;
+}
+
+.timeline-item {
+  position: relative;
+  padding-left: 1.5rem;
+  padding-bottom: 2rem;
+}
+
+.timeline-item:last-child {
+  padding-bottom: 0;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -2.0rem;
+  top: 0.2rem;
+  width: 14px;
+  height: 14px;
+  background-color: var(--accent-color);
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.8);
+  z-index: 2;
+}

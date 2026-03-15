@@ -1957,6 +1957,22 @@ ul {
   color: #fff;
 }
 
+.view-more-btn {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0 0.4rem;
+  transition: color 0.3s ease;
+  display: inline-block;
+}
+
+.view-more-btn:hover {
+  color: var(--accent-color);
+}
+
 /* Dim Blinking Animation */
 @keyframes dimBlink {
   0% { opacity: 0.4; }

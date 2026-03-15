@@ -60,7 +60,7 @@ const About = () => {
                         {truncateText(edu.description, 120)}{' '}
                         {edu.description.length > 120 && (
                           <button 
-                            className="view-more-btn" 
+                            className="view-more-btn dim-blink" 
                             onClick={() => setSelectedEdu(edu)}
                           >
                             View More

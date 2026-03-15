@@ -3,11 +3,13 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 const AdminContext = createContext();
 
 export const AdminProvider = ({ children }) => {
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return localStorage.getItem('isPortfolioAdmin') === 'true';
+  });
 
   useEffect(() => {
-    const savedAdmin = localStorage.getItem('isPortfolioAdmin') === 'true';
-    setIsAdmin(savedAdmin);
+    // Sync logic can go here if needed, but initialization is handled above
   }, []);
 
   const login = (password) => {

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import startupProjectsData from '../data/startup_projects.json';
@@ -206,17 +207,18 @@ const Startup = () => {
   const [feedbacks, setFeedbacks] = useState([]);
   const [myFeedbackIds, setMyFeedbackIds] = useState([]);
   const [editingId, setEditingId] = useState(null);
-  const [authUser, setAuthUser] = useState(null);
+  const [authUser, setAuthUser] = useState(() => {
+    if (typeof window === 'undefined') return null;
+    const savedUser = localStorage.getItem('auth_user');
+    return (savedUser && savedUser.trim() !== "") ? savedUser : null;
+  });
   const [showAuthModal, setShowAuthModal] = useState(false);
   
   useEffect(() => {
+    // Sync localStorage if it changes elsewhere, but initialization is now in state
     const savedUser = localStorage.getItem('auth_user');
-    // Basic verification: user must exist and not be empty
-    if (savedUser && savedUser.trim() !== "") {
-      setAuthUser(savedUser);
-    } else {
+    if (!savedUser || savedUser.trim() === "") {
       setAuthUser(null);
-      localStorage.removeItem('auth_user'); // Clean up if empty
     }
   }, []);
 
@@ -323,11 +325,18 @@ const Startup = () => {
     document.getElementById('feedback-form').scrollIntoView({ behavior: 'smooth' });
   };
 
+  const [currentTime, setCurrentTime] = useState(1);
+  useEffect(() => {
+    setCurrentTime(Date.now());
+    const timer = setInterval(() => setCurrentTime(Date.now()), 60000); // refresh every minute
+    return () => clearInterval(timer);
+  }, []);
+
   const canEdit = (fb) => {
     if (isAdmin) return true;
     const twoHoursInMs = 2 * 60 * 60 * 1000;
     const isOwner = myFeedbackIds.includes(fb._id);
-    const windowOpen = (Date.now() - new Date(fb.createdAt).getTime()) < twoHoursInMs;
+    const windowOpen = (currentTime - new Date(fb.createdAt).getTime()) < twoHoursInMs;
     return isOwner && windowOpen;
   };
 

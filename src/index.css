@@ -1889,14 +1889,12 @@ ul {
 /* Education Timeline Styles */
 .timeline-container {
   margin-top: 1.5rem;
-  padding-left: 1.5rem;
-  border-left: 2px solid rgba(99, 102, 241, 0.4);
   position: relative;
 }
 
 .timeline-item {
   position: relative;
-  padding-left: 1.5rem;
+  padding-left: 2.5rem;
   padding-bottom: 2rem;
 }
 
@@ -1907,15 +1905,26 @@ ul {
 .timeline-item::before {
   content: '';
   position: absolute;
-  left: -2.0rem;
-  top: 0.2rem;
+  left: 0;
+  top: 0.35rem;
   width: 14px;
   height: 14px;
   background-color: var(--accent-color);
   border-radius: 50%;
   box-shadow: 0 0 10px rgba(99, 102, 241, 0.8);
   z-index: 2;
-  transition: all 0.3s ease; /* Added transition for hover */
+  transition: all 0.3s ease;
+}
+
+.timeline-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 0.35rem;
+  bottom: -0.35rem;
+  width: 2px;
+  background-color: rgba(99, 102, 241, 0.4);
+  z-index: 1;
 }
 
 /* Timeline Hover Animation */

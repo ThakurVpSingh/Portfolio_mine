@@ -3,6 +3,19 @@ import { LogOut, Settings, Image as ImageIcon, MessageSquare, Users, Trash2, Edi
 import { motion } from 'framer-motion';
 import { fetchData, postData, putData, deleteData } from '../utils/api';
 import { useAdmin } from '../context/AdminContext';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+
+const quillModules = {
+  toolbar: [
+    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+    ['bold', 'italic', 'underline', 'strike'],
+    [{ 'color': [] }, { 'background': [] }],
+    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+    ['link'],
+    ['clean']
+  ],
+};
 
 const Admin = () => {
   const { isAdmin, login, logout } = useAdmin();
@@ -292,9 +305,16 @@ const Admin = () => {
                 <label>GitHub Link</label>
                 <input type="url" value={projectForm.github} onChange={e => setProjectForm({...projectForm, github: e.target.value})} />
               </div>
-              <div className="form-group-modern">
+              <div className="form-group-modern full-width" style={{ marginBottom: '4rem' }}>
                 <label>Short Description</label>
-                <textarea value={projectForm.description} onChange={e => setProjectForm({...projectForm, description: e.target.value})} required rows="2" />
+                <div style={{ background: '#fff', color: '#000', borderRadius: '4px' }}>
+                  <ReactQuill 
+                    theme="snow" 
+                    value={projectForm.description} 
+                    onChange={val => setProjectForm({...projectForm, description: val})} 
+                    modules={quillModules}
+                  />
+                </div>
               </div>
               <div className="form-group-modern">
                 <label>Duration</label>
@@ -363,9 +383,16 @@ const Admin = () => {
                   </div>
                 </div>
               </div>
-              <div className="form-group-modern full-width">
-                <label>Case Study (Markdown/Plain Text)</label>
-                <textarea value={projectForm.caseStudy} onChange={e => setProjectForm({...projectForm, caseStudy: e.target.value})} rows="6" placeholder="Describe the challenges, solutions, and outcome..." />
+              <div className="form-group-modern full-width" style={{ marginBottom: '4rem' }}>
+                <label>Case Study (Markdown/Plain/Rich Text)</label>
+                <div style={{ background: '#fff', color: '#000', borderRadius: '4px' }}>
+                  <ReactQuill 
+                    theme="snow" 
+                    value={projectForm.caseStudy} 
+                    onChange={val => setProjectForm({...projectForm, caseStudy: val})} 
+                    modules={quillModules}
+                  />
+                </div>
               </div>
               <div className="form-actions-centered">
                 <button type="submit" className="cta-button">{editingProjectId ? 'Update project' : 'Save Project'}</button>
@@ -415,9 +442,16 @@ const Admin = () => {
                 <label>Duration</label>
                 <input type="text" value={eduForm.duration} onChange={e => setEduForm({...eduForm, duration: e.target.value})} placeholder="e.g. 2020 - 2024" />
               </div>
-              <div className="form-group-modern full-width">
+              <div className="form-group-modern full-width" style={{ marginBottom: '4rem' }}>
                 <label>Short Description/Details</label>
-                <textarea value={eduForm.description} onChange={e => setEduForm({...eduForm, description: e.target.value})} rows="2" />
+                <div style={{ background: '#fff', color: '#000', borderRadius: '4px' }}>
+                  <ReactQuill 
+                    theme="snow" 
+                    value={eduForm.description} 
+                    onChange={val => setEduForm({...eduForm, description: val})} 
+                    modules={quillModules}
+                  />
+                </div>
               </div>
               <div className="form-actions-centered">
                 <button type="submit" className="cta-button">{editingEduId ? 'Update education' : 'Save Education'}</button>
@@ -474,9 +508,16 @@ const Admin = () => {
                 <label>Location</label>
                 <input type="text" value={expForm.location} onChange={e => setExpForm({...expForm, location: e.target.value})} />
               </div>
-              <div className="form-group-modern full-width">
+              <div className="form-group-modern full-width" style={{ marginBottom: '4rem' }}>
                 <label>Role Description</label>
-                <textarea value={expForm.description} onChange={e => setExpForm({...expForm, description: e.target.value})} required rows="3" />
+                <div style={{ background: '#fff', color: '#000', borderRadius: '4px' }}>
+                  <ReactQuill 
+                    theme="snow" 
+                    value={expForm.description} 
+                    onChange={val => setExpForm({...expForm, description: val})} 
+                    modules={quillModules}
+                  />
+                </div>
               </div>
               <div className="form-actions-centered">
                 <button type="submit" className="cta-button">{editingExpId ? 'Update Role' : 'Save Role'}</button>

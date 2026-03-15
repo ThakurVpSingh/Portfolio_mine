@@ -7,9 +7,11 @@ const Experience = () => {
   const [experienceData, setExperienceData] = React.useState([]);
   const [selectedExp, setSelectedExp] = React.useState(null);
 
-  const truncateText = (text, maxLength) => {
-    if (!text || text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + '...';
+  const truncateText = (htmlText, maxLength) => {
+    if (!htmlText) return '';
+    const strippedString = htmlText.replace(/(<([^>]+)>)/gi, "");
+    if (strippedString.length <= maxLength) return strippedString;
+    return strippedString.substring(0, maxLength) + '...';
   };
 
 
@@ -57,7 +59,11 @@ const Experience = () => {
                     </p>
                   )}
                   <p style={{ color: '#aaa', marginBottom: '1rem', fontSize: '0.9rem' }}>{selectedExp.duration}</p>
-                  <p style={{ lineHeight: '1.6', color: '#e0e0e0', whiteSpace: 'pre-wrap' }}>{selectedExp.description}</p>
+                  <div 
+                    className="rich-text-content" 
+                    style={{ lineHeight: '1.6', color: '#e0e0e0' }} 
+                    dangerouslySetInnerHTML={{ __html: selectedExp.description }} 
+                  />
                 </motion.div>
             ) : (
               <div className="timeline-container">
@@ -81,7 +87,7 @@ const Experience = () => {
                     <p className="timeline-date" style={{ color: '#aaa', fontSize: '0.9rem', marginBottom: '1rem' }}>{exp.duration}</p>
                     
                     {exp.description && (
-                      <p className="timeline-desc" style={{ lineHeight: '1.6', color: '#e0e0e0' }}>
+                      <p className="timeline-desc" style={{ lineHeight: '1.6', color: '#e0e0e0', whiteSpace: 'pre-wrap' }}>
                         {truncateText(exp.description, 150)}{' '}
                         {exp.description.length > 150 && (
                           <button 

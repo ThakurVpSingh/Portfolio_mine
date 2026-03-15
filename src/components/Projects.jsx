@@ -7,6 +7,13 @@ import { fetchData } from '../utils/api';
 const Projects = () => {
   const [projects, setProjects] = React.useState([]);
 
+  const truncateText = (htmlText, maxLength) => {
+    if (!htmlText) return '';
+    const strippedString = htmlText.replace(/(<([^>]+)>)/gi, "");
+    if (strippedString.length <= maxLength) return strippedString;
+    return strippedString.substring(0, maxLength) + '...';
+  };
+
   React.useEffect(() => {
     const loadProjects = async () => {
       const data = await fetchData('projects');
@@ -31,7 +38,7 @@ const Projects = () => {
               >
                 <div className="project-content">
                   <h3>{project.title}</h3>
-                  <p>{project.description}</p>
+                  <p style={{ whiteSpace: 'pre-wrap' }}>{truncateText(project.description, 120)}</p>
                   <div className="tech-tags">
                     {project.tech.map((tag, i) => (
                       <span key={i} className="tech-tag">{tag}</span>

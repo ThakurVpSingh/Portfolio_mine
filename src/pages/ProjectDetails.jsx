@@ -57,7 +57,10 @@ const ProjectDetails = () => {
               <span key={i} className="tech-tag-pill">{tag}</span>
             ))}
           </div>
-          <p className="project-description-large">{project.description}</p>
+          <div 
+            className="project-description-large rich-text-content" 
+            dangerouslySetInnerHTML={{ __html: project.description }} 
+          />
           
           <div className="project-links-row">
             {project.link && (
@@ -77,11 +80,9 @@ const ProjectDetails = () => {
       <div className="project-content-grid">
         <div className="case-study-content glass-card">
           <h2 className="sub-heading">Case Study</h2>
-          <div className="markdown-body">
+          <div className="markdown-body rich-text-content">
             {project.caseStudy ? (
-              project.caseStudy.split('\n').map((para, i) => (
-                <p key={i}>{para}</p>
-              ))
+              <div dangerouslySetInnerHTML={{ __html: project.caseStudy }} />
             ) : (
               <p>No case study available for this project.</p>
             )}

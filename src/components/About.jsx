@@ -7,9 +7,11 @@ const About = () => {
   const [eduData, setEduData] = React.useState([]);
   const [selectedEdu, setSelectedEdu] = React.useState(null);
 
-  const truncateText = (text, maxLength) => {
-    if (!text || text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + '...';
+  const truncateText = (htmlText, maxLength) => {
+    if (!htmlText) return '';
+    const strippedString = htmlText.replace(/(<([^>]+)>)/gi, "");
+    if (strippedString.length <= maxLength) return strippedString;
+    return strippedString.substring(0, maxLength) + '...';
   };
 
   React.useEffect(() => {
@@ -49,7 +51,11 @@ const About = () => {
                 </div>
                 <p style={{ fontWeight: 600, marginBottom: '0.5rem' }}>{selectedEdu.school}</p>
                 <p style={{ color: '#aaa', marginBottom: '1rem', fontSize: '0.9rem' }}>{selectedEdu.duration}</p>
-                <p style={{ lineHeight: '1.6', color: '#e0e0e0' }}>{selectedEdu.description}</p>
+                <div 
+                  className="rich-text-content" 
+                  style={{ lineHeight: '1.6', color: '#e0e0e0' }} 
+                  dangerouslySetInnerHTML={{ __html: selectedEdu.description }} 
+                />
               </motion.div>
             ) : (
               <div className="timeline-container">
@@ -58,7 +64,7 @@ const About = () => {
                     <p className="timeline-title"><strong>{edu.degree}</strong></p>
                     <p className="timeline-school">{edu.school} ({edu.duration})</p>
                     {edu.description && (
-                      <p className="timeline-desc">
+                      <p className="timeline-desc" style={{ whiteSpace: 'pre-wrap', lineHeight: '1.6' }}>
                         {truncateText(edu.description, 120)}{' '}
                         {edu.description.length > 120 && (
                           <button 

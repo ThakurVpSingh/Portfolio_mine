@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { fetchData } from '../utils/api';
+import { sortChronologically } from '../utils/dateUtils';
 
 const Experience = () => {
   const [experienceData, setExperienceData] = React.useState([]);
@@ -8,7 +9,8 @@ const Experience = () => {
   React.useEffect(() => {
     const loadExperience = async () => {
       const data = await fetchData('experience');
-      setExperienceData(data);
+      const sortedData = sortChronologically(data, 'duration');
+      setExperienceData(sortedData);
     };
     loadExperience();
   }, []);

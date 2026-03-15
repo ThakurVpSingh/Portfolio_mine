@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { fetchData } from '../utils/api';
+import { sortChronologically } from '../utils/dateUtils';
 
 const About = () => {
   const [eduData, setEduData] = React.useState([]);
@@ -14,7 +15,8 @@ const About = () => {
   React.useEffect(() => {
     const loadEdu = async () => {
       const data = await fetchData('education');
-      setEduData(data);
+      const sortedData = sortChronologically(data, 'duration');
+      setEduData(sortedData);
     };
     loadEdu();
   }, []);

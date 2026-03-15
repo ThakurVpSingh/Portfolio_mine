@@ -28,7 +28,10 @@ export default defineConfig([
       'react-hooks/exhaustive-deps': 'off',
       'react-hooks/rules-of-hooks': 'off',
       'react-compiler/purity': 'off',
-      'react-hooks/set-state-in-effect': 'off'
+      'react-hooks/set-state-in-effect': 'off',
+      'react-refresh/only-export-components': 'off',
+      'react/prop-types': 'off',
+      'react/display-name': 'off'
     },
   },
 ])
